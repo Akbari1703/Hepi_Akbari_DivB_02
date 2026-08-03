@@ -1,0 +1,943 @@
+==========================================================================================
+1.
+==========================================================================================
+SQL> DECLARE
+  2      s1 number := 43;
+  3      s2 number := 53;
+  4      s3 number := 63;
+  5      s4 number := 73;
+  6      s5 number := 83;
+  7
+  8      total number;
+  9      percentage number;
+ 10      grade varchar2(5);
+ 11      result varchar2(30);
+ 12  BEGIN
+ 13      total := s1 + s2 + s3 + s4 + s5;
+ 14      percentage := total / 5;
+ 15
+ 16      if percentage >= 90 then
+ 17          grade := 'A+';
+ 18      elsif percentage >= 80 then
+ 19          grade := 'A';
+ 20      elsif percentage >= 70 then
+ 21          grade := 'B';
+ 22      elsif percentage >= 60 then
+ 23          grade := 'C';
+ 24      elsif percentage >= 50 then
+ 25          grade := 'D';
+ 26      else
+ 27          grade := 'FAIL';
+ 28      end if;
+ 29
+ 30      IF s1 < 35 OR s2 < 35 OR s3 < 35 OR s4 < 35 OR s5 < 35 THEN
+ 31          result := 'DETAINED';
+ 32
+ 33          dbms_output.put_line('RESULT : DETAINED');
+ 34
+ 35          if s1 < 35 then
+ 36              dbms_output.put_line('Failed in Subject 1');
+ 37          end if;
+ 38
+ 39          if s2 < 35 then
+ 40              dbms_output.put_line('Failed in Subject 2');
+ 41          end if;
+ 42
+ 43          if s3 < 35 then
+ 44              dbms_output.put_line('Failed in Subject 3');
+ 45          end if;
+ 46
+ 47          if s4 < 35 then
+ 48              dbms_output.put_line('Failed in Subject 4');
+ 49          end if;
+ 50
+ 51          if s5 < 35 then
+ 52              dbms_output.put_line('Failed in Subject 5');
+ 53          end if;
+ 54
+ 55      else
+ 56          if percentage >= 75 then
+ 57              result := 'Distinction';
+ 58          elsif percentage >= 60 then
+ 59              result := 'First Class';
+ 60          elsif percentage >= 50 then
+ 61              result := 'Second Class';
+ 62          else
+ 63              result := 'Pass';
+ 64          end if;
+ 65     end if;
+ 66
+ 67      dbms_output.put_line('----------- REPORT CARD -----------');
+ 68      dbms_output.put_line('Subject 1 : ' || s1);
+ 69      dbms_output.put_line('Subject 2 : ' || s2);
+ 70      dbms_output.put_line('Subject 3 : ' || s3);
+ 71      dbms_output.put_line('Subject 4 : ' || s4);
+ 72      dbms_output.put_line('Subject 5 : ' || s5);
+ 73      dbms_output.put_line('-----------------------------------');
+ 74      dbms_output.put_line('Total      : ' || total);
+ 75      dbms_output.put_line('Percentage : ' || percentage);
+ 76      dbms_output.put_line('Grade      : ' || grade);
+ 77      dbms_output.put_line('Result     : ' || result);
+ 78  END;
+ 79  /
+----------- REPORT CARD -----------
+Subject 1 : 43
+Subject 2 : 53
+Subject 3 : 63
+Subject 4 : 73
+Subject 5 : 83
+-----------------------------------
+Total      : 315
+Percentage : 63
+Grade      : C
+Result     : First Class
+
+--------------------------------------------------------------------------------------------------
+
+================================================================================================
+2.
+================================================================================================
+SQL> DECLARE
+  2      gross_salary number:= 1000000;
+  3      standard_deduction constant number := 75000;
+  4      taxable_income number;
+  5      tax NUMBER := 0;
+  6      monthly_tds number;
+  7      take_home_monthly number;
+  8  BEGIN
+  9      taxable_income := gross_salary - standard_deduction;
+ 10
+ 11      if taxable_income < 0 then
+ 12          taxable_income := 0;
+ 13      end if;
+ 14
+ 15      tax :=
+ 16          CASE
+ 17              when taxable_income <= 300000 then
+ 18                  0
+ 19
+ 20              when taxable_income <= 700000 then
+ 21                  (taxable_income - 300000) * 0.05
+ 22
+ 23              when taxable_income <= 1000000 then
+ 24                  20000 +
+ 25                  (taxable_income - 700000) * 0.10
+ 26
+ 27              when taxable_income <= 1200000 then
+ 28                  50000 +
+ 29                  (taxable_income - 1000000) * 0.15
+ 30
+ 31              when taxable_income <= 1500000 then
+ 32                  80000 +
+ 33                  (taxable_income - 1200000) * 0.20
+ 34
+ 35              else
+ 36                  140000 +
+ 37                  (taxable_income - 1500000) * 0.30
+ 38          END;
+ 39
+ 40      monthly_tds := tax / 12;
+ 41      take_home_monthly := (gross_salary - tax) / 12;
+ 42
+ 43      dbms_output.put_line('----------- INCOME TAX REPORT -----------');
+ 44      dbms_output.put_line('Gross Annual Salary      : Rs. ' || gross_salary);
+ 45      dbms_output.put_line('Standard Deduction       : Rs. ' || standard_deduction);
+ 46      dbms_output.put_line('Taxable Income           : Rs. ' || taxable_income);
+ 47      dbms_output.put_line('Total Tax               : Rs. ' || tax);
+ 48      dbms_output.put_line('Monthly TDS             : Rs. ' || ROUND(monthly_tds));
+ 49      dbms_output.put_line('Take Home Monthly Salary: Rs. ' || ROUND(take_home_monthly));
+ 50
+ 51      if tax = 0 then
+ 52          dbms_output.put_line('No tax this year — save more with PPF/ELSS!');
+ 53      end if;
+ 54  END;
+ 55  /
+----------- INCOME TAX REPORT -----------
+Gross Annual Salary      : Rs. 1000000
+Standard Deduction       : Rs. 75000
+Taxable Income           : Rs. 925000
+Total Tax               : Rs. 42500
+Monthly TDS             : Rs. 3542
+Take Home Monthly Salary: Rs. 79792
+---------------------------------------------------------------------------------------------
+
+=================================================================================================
+3
+=================================================================================================
+SQL> DECLARE
+  2      roll_no number := 1;
+  3      balance number := roll_no * 500 + 5000;
+  4      TYPE choice_array is varray(4) of number;
+  5      TYPE amount_array is varray(4) of number;
+  6      v_choice choice_array := choice_array(1,1,1,3);
+  7      withdraw amount_array := amount_array(500,1000,500,0);
+  8      i number := 1;
+  9      txn_count number := 0;
+ 10      total_withdrawn number := 0;
+ 11  BEGIN
+ 12      dbms_output.put_line('Initial Balance : Rs. ' || balance);
+ 13      dbms_output.put_line('--------------------------------');
+ 14
+ 15      LOOP
+ 16          EXIT WHEN i > v_choice.COUNT;
+ 17          dbms_output.put_line('Iteration : ' || i);
+ 18
+ 19          if v_choice(i) = 3 THEN
+ 20              dbms_output.put_line('Exit Selected');
+ 21              EXIT;
+ 22          end if;
+ 23
+ 24          if v_choice(i) = 1 then
+ 25
+ 26              if withdraw(i) <= 0 then
+ 27                  dbms_output.put_line('Error: Amount must be greater than 0');
+ 28
+ 29              elsif MOD(withdraw(i),100) <> 0 then
+ 30                  dbms_output.put_line('Error: Amount must be multiple of 100');
+ 31
+ 32              elsif withdraw(i) > 10000 then
+ 33                  dbms_output.put_line('Error: Maximum withdrawal per transaction is Rs.10000');
+ 34
+ 35              elsif withdraw(i) > balance then
+ 36                  dbms_output.put_line('Error: Insufficient Balance');
+ 37
+ 38              else
+ 39                  balance := balance - withdraw(i);
+ 40                  txn_count := txn_count + 1;
+ 41                  total_withdrawn := total_withdrawn + withdraw(i);
+ 42
+ 43                  dbms_output.put_line('Withdrawal Successful');
+ 44                  dbms_output.put_line('Amount Withdrawn : Rs. ' || withdraw(i));
+ 45                  dbms_output.put_line('Remaining Balance: Rs. ' || balance);
+ 46              end if;
+ 47
+ 48          end if;
+ 49
+ 50          dbms_output.put_line('--------------------------------');
+ 51          exit when balance = 0;
+ 52          i := i + 1;
+ 53      end loop;
+ 54
+ 55      dbms_output.put_line('========== ATM SUMMARY ==========');
+ 56      dbms_output.put_line('Successful Transactions : ' || txn_count);
+ 57      dbms_output.put_line('Total Withdrawn         : Rs. ' || total_withdrawn);
+ 58      dbms_output.put_line('Closing Balance         : Rs. ' || balance);
+ 59
+ 60  END;
+ 61  /
+Initial Balance : Rs. 5500
+--------------------------------
+Iteration : 1
+Withdrawal Successful
+Amount Withdrawn : Rs. 500
+Remaining Balance: Rs. 5000
+--------------------------------
+Iteration : 2
+Withdrawal Successful
+Amount Withdrawn : Rs. 1000
+Remaining Balance: Rs. 4000
+--------------------------------
+Iteration : 3
+Withdrawal Successful
+Amount Withdrawn : Rs. 500
+Remaining Balance: Rs. 3500
+--------------------------------
+Iteration : 4
+Exit Selected
+========== ATM SUMMARY ==========
+Successful Transactions : 3
+Total Withdrawn         : Rs. 2000
+Closing Balance         : Rs. 3500
+--------------------------------------------------------------------------------------------------
+
+===============================================================================================
+4
+===============================================================================================
+SQL> DECLARE
+  2      roll_no number := 1;
+  3      table_no number;
+  4      height number;
+  5      stars varchar2(20);
+  6      nums varchar2(20);
+  7  BEGIN
+  8      table_no := MOD(roll_no, 9) + 2;
+  9      height := 5 + MOD(roll_no, 5);
+ 10
+ 11      -------------------------------------------------
+ 12      -- Part A : Multiplication Table
+ 13      -------------------------------------------------
+ 14      dbms_output.put_line('Part A : Multiplication Table of ' || table_no);
+ 15      for i in 1..20 loop
+ 16          dbms_output.put_line(
+ 17              table_no || ' x ' || i || ' = ' || table_no * i
+ 18          );
+ 19      end loop;
+ 20
+ 21      -------------------------------------------------
+ 22      -- Part B : Tables of 2,3,4,5
+ 23      -------------------------------------------------
+ 24      dbms_output.put_line(CHR(10) || 'Part B : Tables of 2,3,4,5');
+ 25
+ 26      for t IN 2..5 loop
+ 27          dbms_output.put_line('Table of ' || t);
+ 28
+ 29          for i in 1..10 loop
+ 30              dbms_output.put_line(
+ 31                  LPAD(t,2) || ' x ' ||
+ 32                  LPAD(i,2) || ' = ' ||
+ 33                  LPAD(t*i,3)
+ 34              );
+ 35         end loop;
+ 36
+ 37          dbms_output.put_line('----------------------');
+ 38      end loop;
+ 39
+ 40      -------------------------------------------------
+ 41      -- Part C : Star Triangle
+ 42      -------------------------------------------------
+ 43      dbms_output.put_line(CHR(10) || 'Part C : Star Triangle');
+ 44
+ 45      for i in 1..height loop
+ 46          stars := '';
+ 47          for j IN 1..i loop
+ 48              stars := stars || '*';
+ 49          end loop;
+ 50
+ 51          dbms_output.put_line(stars);
+ 52      end loop;
+ 53
+ 54      -------------------------------------------------
+ 55      -- Part D : Number Pyramid
+ 56      -------------------------------------------------
+ 57      dbms_output.put_line(CHR(10) || 'Part D : Number Pyramid');
+ 58
+ 59      for i in 1..6 loop
+ 60          nums := '';
+ 61
+ 62          for j in 1..i loop
+ 63              nums := nums || j;
+ 64          end loop;
+ 65
+ 66          dbms_output.put_line(nums);
+ 67      end loop;
+ 68
+ 69      -------------------------------------------------
+ 70      -- Part E : Reverse Star Triangle
+ 71      -------------------------------------------------
+ 72      dbms_output.put_line(CHR(10) || 'Part E : Reverse Star Triangle');
+ 73
+ 74      for i in reverse 1..height loop
+ 75          stars := '';
+ 76
+ 77          for j in 1..i loop
+ 78              stars := stars || '*';
+ 79          end loop;
+ 80
+ 81          dbms_output.put_line(stars);
+ 82      end loop;
+ 83
+ 84  END;
+ 85  /
+Part A : Multiplication Table of 3
+3 x 1 = 3
+3 x 2 = 6
+3 x 3 = 9
+3 x 4 = 12
+3 x 5 = 15
+3 x 6 = 18
+3 x 7 = 21
+3 x 8 = 24
+3 x 9 = 27
+3 x 10 = 30
+3 x 11 = 33
+3 x 12 = 36
+3 x 13 = 39
+3 x 14 = 42
+3 x 15 = 45
+3 x 16 = 48
+3 x 17 = 51
+3 x 18 = 54
+3 x 19 = 57
+3 x 20 = 60
+
+Part B : Tables of 2,3,4,5
+Table of 2
+2 x  1 =   2
+2 x  2 =   4
+2 x  3 =   6
+2 x  4 =   8
+2 x  5 =  10
+2 x  6 =  12
+2 x  7 =  14
+2 x  8 =  16
+2 x  9 =  18
+2 x 10 =  20
+----------------------
+Table of 3
+3 x  1 =   3
+3 x  2 =   6
+3 x  3 =   9
+3 x  4 =  12
+3 x  5 =  15
+3 x  6 =  18
+3 x  7 =  21
+3 x  8 =  24
+3 x  9 =  27
+3 x 10 =  30
+----------------------
+Table of 4
+4 x  1 =   4
+4 x  2 =   8
+4 x  3 =  12
+4 x  4 =  16
+4 x  5 =  20
+4 x  6 =  24
+4 x  7 =  28
+4 x  8 =  32
+4 x  9 =  36
+4 x 10 =  40
+----------------------
+Table of 5
+5 x  1 =   5
+5 x  2 =  10
+5 x  3 =  15
+5 x  4 =  20
+5 x  5 =  25
+5 x  6 =  30
+5 x  7 =  35
+5 x  8 =  40
+5 x  9 =  45
+5 x 10 =  50
+----------------------
+
+Part C : Star Triangle
+*
+**
+***
+****
+*****
+******
+
+Part D : Number Pyramid
+1
+12
+123
+1234
+12345
+123456
+
+Part E : Reverse Star Triangle
+******
+*****
+****
+***
+**
+*
+-------------------------------------------------------------------------------------------------
+
+==================================================================================================
+5
+==================================================================================================
+SQL> DECLARE
+  2      roll_no NUMBER := 1;
+  3
+  4      -- Part A
+  5      n NUMBER;
+  6      a NUMBER := 0;
+  7      b NUMBER := 1;
+  8      c NUMBER;
+  9
+ 10      -- Part B
+ 11      fib_last NUMBER;
+ 12      i NUMBER;
+ 13      is_prime BOOLEAN := TRUE;
+ 14
+ 15      -- Part C
+ 16      num NUMBER;
+ 17      divisor NUMBER;
+ 18      prime_count NUMBER := 0;
+ 19
+ 20      -- Part D
+ 21      x NUMBER := 48;
+ 22      y NUMBER := 18;
+ 23      r NUMBER;
+ 24
+ 25      -- Part E
+ 26      pnum NUMBER := 6;
+ 27      sum_div NUMBER := 0;
+ 28
+ 29  BEGIN
+ 30      -------------------------------------------------
+ 31      -- Part A : Fibonacci Series
+ 32      -------------------------------------------------
+ 33      n := 5 + MOD(roll_no,8);
+ 34
+ 35      DBMS_OUTPUT.PUT_LINE('Part A : First ' || n || ' Fibonacci Numbers');
+ 36
+ 37      i := 1;
+ 38
+ 39      WHILE i <= n LOOP
+ 40          DBMS_OUTPUT.PUT(a || ' ');
+ 41
+ 42          fib_last := a;
+ 43
+ 44          c := a + b;
+ 45          a := b;
+ 46          b := c;
+ 47
+ 48          i := i + 1;
+ 49      END LOOP;
+ 50
+ 51      DBMS_OUTPUT.NEW_LINE;
+ 52
+ 53      -------------------------------------------------
+ 54      -- Part B : Prime Check
+ 55      -------------------------------------------------
+ 56      DBMS_OUTPUT.PUT_LINE(CHR(10) || 'Part B : Prime Check');
+ 57
+ 58      IF fib_last < 2 THEN
+ 59          is_prime := FALSE;
+ 60      ELSE
+ 61          divisor := 2;
+ 62
+ 63          WHILE divisor <= fib_last/2 LOOP
+ 64              IF MOD(fib_last, divisor) = 0 THEN
+ 65                  is_prime := FALSE;
+ 66                  EXIT;
+ 67              END IF;
+ 68
+ 69              divisor := divisor + 1;
+ 70          END LOOP;
+ 71      END IF;
+ 72
+ 73      IF is_prime THEN
+ 74          DBMS_OUTPUT.PUT_LINE(fib_last || ' is Prime');
+ 75      ELSE
+ 76          DBMS_OUTPUT.PUT_LINE(fib_last || ' is Not Prime');
+ 77      END IF;
+ 78
+ 79      -------------------------------------------------
+ 80      -- Part C : Primes 1 to 100
+ 81      -------------------------------------------------
+ 82      DBMS_OUTPUT.PUT_LINE(CHR(10) || 'Part C : Prime Numbers (1-100)');
+ 83
+ 84      num := 2;
+ 85
+ 86      WHILE num <= 100 LOOP
+ 87
+ 88          is_prime := TRUE;
+ 89          divisor := 2;
+ 90
+ 91          WHILE divisor <= num/2 LOOP
+ 92              IF MOD(num, divisor) = 0 THEN
+ 93                  is_prime := FALSE;
+ 94                  EXIT;
+ 95              END IF;
+ 96
+ 97              divisor := divisor + 1;
+ 98          END LOOP;
+ 99
+100          IF is_prime THEN
+101              DBMS_OUTPUT.PUT(num || ' ');
+102              prime_count := prime_count + 1;
+103          END IF;
+104
+105          num := num + 1;
+106
+107      END LOOP;
+108
+109      DBMS_OUTPUT.NEW_LINE;
+110      DBMS_OUTPUT.PUT_LINE('Total Prime Numbers = ' || prime_count);
+111
+112      -------------------------------------------------
+113      -- Part D : GCD
+114      -------------------------------------------------
+115      DBMS_OUTPUT.PUT_LINE(CHR(10) || 'Part D : GCD');
+116
+117      WHILE y <> 0 LOOP
+118          r := MOD(x,y);
+119          x := y;
+120          y := r;
+121      END LOOP;
+122
+123      DBMS_OUTPUT.PUT_LINE('GCD = ' || x);
+124
+125      -------------------------------------------------
+126      -- Part E : Perfect Number
+127      -------------------------------------------------
+128      DBMS_OUTPUT.PUT_LINE(CHR(10) || 'Part E : Perfect Number');
+129
+130      divisor := 1;
+131      sum_div := 0;
+132
+133      WHILE divisor < pnum LOOP
+134          IF MOD(pnum, divisor) = 0 THEN
+135              sum_div := sum_div + divisor;
+136          END IF;
+137
+138          divisor := divisor + 1;
+139      END LOOP;
+140
+141      IF sum_div = pnum THEN
+142          DBMS_OUTPUT.PUT_LINE(pnum || ' is a Perfect Number');
+143      ELSE
+144          DBMS_OUTPUT.PUT_LINE(pnum || ' is Not a Perfect Number');
+145      END IF;
+146
+147  END;
+148  /
+Part A : First 6 Fibonacci Numbers
+0 1 1 2 3 5
+
+Part B : Prime Check
+5 is Prime
+
+Part C : Prime Numbers (1-100)
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+Total Prime Numbers = 25
+
+Part D : GCD
+GCD = 6
+
+Part E : Perfect Number
+6 is a Perfect Number
+-----------------------------------------------------------------------------------
+===============================================================================================
+6
+================================================================================================
+SQL> DECLARE
+  2      -- Input Values
+  3      food_total NUMBER := 350;
+  4      distance NUMBER := 5;          -- in KM
+  5      order_hour NUMBER := 13;       -- 24-hour format
+  6      rain CHAR(1) := 'Y';
+  7      festival CHAR(1) := 'N';
+  8      first_order CHAR(1) := 'N';
+  9
+ 10      base_charge NUMBER := 0;
+ 11      rain_charge NUMBER := 0;
+ 12      late_charge NUMBER := 0;
+ 13      festival_charge NUMBER := 0;
+ 14      peak_charge NUMBER := 0;
+ 15      discount NUMBER := 0;
+ 16      final_delivery NUMBER := 0;
+ 17      grand_total NUMBER := 0;
+ 18
+ 19  BEGIN
+ 20      --------------------------------------------------
+ 21      -- Base Delivery Charge (IF)
+ 22      --------------------------------------------------
+ 23      IF distance < 3 THEN
+ 24          base_charge := 0;
+ 25      ELSIF distance <= 8 THEN
+ 26          base_charge := 29;
+ 27      ELSIF distance <= 15 THEN
+ 28          base_charge := 49;
+ 29      ELSE
+ 30          base_charge := 79;
+ 31      END IF;
+ 32
+ 33      final_delivery := base_charge;
+ 34
+ 35      --------------------------------------------------
+ 36      -- Rain Surcharge (CASE)
+ 37      --------------------------------------------------
+ 38      rain_charge :=
+ 39          CASE
+ 40              WHEN rain = 'Y' THEN ROUND(base_charge * 0.20)
+ 41              ELSE 0
+ 42          END;
+ 43
+ 44      final_delivery := final_delivery + rain_charge;
+ 45
+ 46      --------------------------------------------------
+ 47      -- Late Night Surcharge (CASE)
+ 48      --------------------------------------------------
+ 49      late_charge :=
+ 50          CASE
+ 51              WHEN order_hour >= 22 OR order_hour < 6
+ 52              THEN ROUND(base_charge * 0.15)
+ 53              ELSE 0
+ 54          END;
+ 55
+ 56      final_delivery := final_delivery + late_charge;
+ 57
+ 58      --------------------------------------------------
+ 59      -- Festival Surcharge (CASE)
+ 60      --------------------------------------------------
+ 61      festival_charge :=
+ 62          CASE
+ 63              WHEN festival = 'Y'
+ 64              THEN ROUND(base_charge * 0.10)
+ 65              ELSE 0
+ 66          END;
+ 67
+ 68      final_delivery := final_delivery + festival_charge;
+ 69
+ 70      --------------------------------------------------
+ 71      -- Peak Hour Surcharge (CASE)
+ 72      --------------------------------------------------
+ 73      peak_charge :=
+ 74          CASE
+ 75              WHEN (order_hour BETWEEN 12 AND 14)
+ 76                OR (order_hour BETWEEN 19 AND 21)
+ 77              THEN ROUND(base_charge * 0.10)
+ 78              ELSE 0
+ 79          END;
+ 80
+ 81      final_delivery := final_delivery + peak_charge;
+ 82
+ 83      --------------------------------------------------
+ 84      -- Discounts (IF)
+ 85      --------------------------------------------------
+ 86      IF food_total > 499 THEN
+ 87          final_delivery := 0;
+ 88
+ 89      ELSIF first_order = 'Y' THEN
+ 90          discount := ROUND(final_delivery * 0.50);
+ 91          final_delivery := final_delivery - discount;
+ 92      END IF;
+ 93
+ 94      grand_total := food_total + final_delivery;
+ 95
+ 96      --------------------------------------------------
+ 97      -- Receipt
+ 98      --------------------------------------------------
+ 99      DBMS_OUTPUT.PUT_LINE('========== ZOMATO RECEIPT ==========');
+100      DBMS_OUTPUT.PUT_LINE('Food Total          : Rs. ' || food_total);
+101      DBMS_OUTPUT.PUT_LINE('Base Delivery       : Rs. ' || base_charge);
+102      DBMS_OUTPUT.PUT_LINE('Rain Charge         : Rs. ' || rain_charge);
+103      DBMS_OUTPUT.PUT_LINE('Late Night Charge   : Rs. ' || late_charge);
+104      DBMS_OUTPUT.PUT_LINE('Festival Charge     : Rs. ' || festival_charge);
+105      DBMS_OUTPUT.PUT_LINE('Peak Hour Charge    : Rs. ' || peak_charge);
+106      DBMS_OUTPUT.PUT_LINE('Discount            : Rs. ' || discount);
+107      DBMS_OUTPUT.PUT_LINE('------------------------------------');
+108      DBMS_OUTPUT.PUT_LINE('Final Delivery      : Rs. ' || final_delivery);
+109      DBMS_OUTPUT.PUT_LINE('Grand Total         : Rs. ' || grand_total);
+110  END;
+111  /
+========== ZOMATO RECEIPT ==========
+Food Total          : Rs. 350
+Base Delivery       : Rs. 29
+Rain Charge         : Rs. 6
+Late Night Charge   : Rs. 0
+Festival Charge     : Rs. 0
+Peak Hour Charge    : Rs. 3
+Discount            : Rs. 0
+------------------------------------
+Final Delivery      : Rs. 38
+Grand Total         : Rs. 388
+-------------------------------------------------------------------------------------------
+
+===============================================================================================
+7
+===============================================================================================
+SQL> DECLARE
+  2      -- Student Details
+  3      attendance_pct   NUMBER := 51;
+  4      theory_marks     NUMBER := 31;   -- Out of 70
+  5      practical_marks  NUMBER := 13;   -- Out of 30
+  6      assignment_marks NUMBER := 15;   -- Out of 20 (Max 10 counted)
+  7
+  8      assignment_count NUMBER;
+  9      total_marks      NUMBER;
+ 10      percentage       NUMBER;
+ 11      grade            CHAR(2);
+ 12      result           VARCHAR2(30);
+ 13      remark           VARCHAR2(50);
+ 14
+ 15  BEGIN
+ 16      -- Maximum 10 assignment marks counted
+ 17      assignment_count := LEAST(assignment_marks,10);
+ 18
+ 19      -------------------------------------------------
+ 20      -- DETAINED / FAIL / PASS
+ 21      -------------------------------------------------
+ 22
+ 23      IF attendance_pct < 40 THEN
+ 24          result := 'DETAINED';
+ 25          remark := 'Attendance Shortage';
+ 26
+ 27      ELSIF theory_marks < 28 THEN
+ 28          result := 'FAIL';
+ 29          remark := 'Fail in Theory';
+ 30
+ 31      ELSIF practical_marks < 12 THEN
+ 32          result := 'FAIL';
+ 33          remark := 'Fail in Practical';
+ 34
+ 35      ELSE
+ 36          total_marks := theory_marks + practical_marks + assignment_count;
+ 37          percentage := (total_marks / 110) * 100;
+ 38
+ 39          -- Grade using CASE
+ 40          grade :=
+ 41          CASE
+ 42              WHEN percentage >= 90 THEN 'A+'
+ 43              WHEN percentage >= 80 THEN 'A'
+ 44              WHEN percentage >= 70 THEN 'B'
+ 45              WHEN percentage >= 60 THEN 'C'
+ 46              WHEN percentage >= 50 THEN 'D'
+ 47              ELSE 'F'
+ 48          END;
+ 49
+ 50          result := 'PASS';
+ 51
+ 52          -- Remark
+ 53          CASE
+ 54              WHEN percentage >= 75 THEN
+ 55                  remark := 'DISTINCTION';
+ 56              WHEN percentage >= 60 THEN
+ 57                  remark := 'FIRST CLASS';
+ 58              WHEN percentage >= 50 THEN
+ 59                  remark := 'SECOND CLASS';
+ 60              ELSE
+ 61                  remark := 'PASS';
+ 62          END CASE;
+ 63      END IF;
+ 64
+ 65      -------------------------------------------------
+ 66      -- Report Card
+ 67      -------------------------------------------------
+ 68
+ 69      DBMS_OUTPUT.PUT_LINE('========== LJICA SEMESTER RESULT ==========');
+ 70      DBMS_OUTPUT.PUT_LINE('Attendance (%)      : ' || attendance_pct);
+ 71      DBMS_OUTPUT.PUT_LINE('Theory Marks        : ' || theory_marks || '/70');
+ 72      DBMS_OUTPUT.PUT_LINE('Practical Marks     : ' || practical_marks || '/30');
+ 73      DBMS_OUTPUT.PUT_LINE('Assignment Marks    : ' || assignment_count || '/10');
+ 74
+ 75      IF result <> 'DETAINED'
+ 76         AND NOT (theory_marks < 28 OR practical_marks < 12) THEN
+ 77
+ 78          DBMS_OUTPUT.PUT_LINE('------------------------------------------');
+ 79          DBMS_OUTPUT.PUT_LINE('Total Marks         : ' || total_marks || '/110');
+ 80          DBMS_OUTPUT.PUT_LINE('Percentage          : ' || ROUND(percentage,2) || '%');
+ 81          DBMS_OUTPUT.PUT_LINE('Grade               : ' || grade);
+ 82      END IF;
+ 83
+ 84      DBMS_OUTPUT.PUT_LINE('Result              : ' || result);
+ 85      DBMS_OUTPUT.PUT_LINE('Remark              : ' || remark);
+ 86
+ 87  END;
+ 88  /
+========== LJICA SEMESTER RESULT ==========
+Attendance (%)      : 51
+Theory Marks        : 31/70
+Practical Marks     : 13/30
+Assignment Marks    : 10/10
+------------------------------------------
+Total Marks         : 54/110
+Percentage          : 49.09%
+Grade               : F
+Result              : PASS
+Remark              : PASS
+---------------------------------------------------------------------------------------
+
+===================================================================================================
+8
+===================================================================================================
+SQL> DECLARE
+  2      -- Input Values
+  3      monthly_salary NUMBER := 25000;
+  4      existing_emi   NUMBER := 2000;
+  5      loan_amount    NUMBER := 250000;
+  6      annual_rate    NUMBER := 10;      -- %
+  7      tenure_months  NUMBER := 120;
+  8
+  9      -- Variables
+ 10      monthly_rate NUMBER;
+ 11      emi NUMBER;
+ 12      foir_limit NUMBER;
+ 13      approved_amount NUMBER;
+ 14      decision VARCHAR2(20);
+ 15      available_emi NUMBER;
+ 16
+ 17  BEGIN
+ 18      -- Monthly Interest Rate
+ 19      monthly_rate := annual_rate / (12 * 100);
+ 20
+ 21      -- FOIR Limit (40% of Salary)
+ 22      foir_limit := monthly_salary * 0.40;
+ 23
+ 24      -- Available EMI after existing EMI
+ 25      available_emi := foir_limit - existing_emi;
+ 26
+ 27      approved_amount := loan_amount;
+ 28
+ 29      -- Salary Check
+ 30      IF monthly_salary < 25000 THEN
+ 31          decision := 'REJECTED';
+ 32
+ 33      -- Maximum Loan Check
+ 34      ELSIF loan_amount > (monthly_salary * 60) THEN
+ 35          decision := 'REJECTED';
+ 36
+ 37      ELSE
+ 38
+ 39          -- EMI Formula
+ 40          emi := approved_amount * monthly_rate *
+ 41                 POWER(1 + monthly_rate, tenure_months) /
+ 42                 (POWER(1 + monthly_rate, tenure_months) - 1);
+ 43
+ 44          -- Reduce Loan Until EMI Fits FOIR
+ 45          WHILE emi > available_emi LOOP
+ 46
+ 47              approved_amount := approved_amount - 10000;
+ 48
+ 49              IF approved_amount <= 0 THEN
+ 50                  EXIT;
+ 51              END IF;
+ 52
+ 53              emi := approved_amount * monthly_rate *
+ 54                     POWER(1 + monthly_rate, tenure_months) /
+ 55                     (POWER(1 + monthly_rate, tenure_months) - 1);
+ 56
+ 57          END LOOP;
+ 58
+ 59          -- Decision using CASE
+ 60          decision :=
+ 61          CASE
+ 62              WHEN approved_amount = loan_amount THEN
+ 63                  'APPROVED'
+ 64              WHEN approved_amount > 0 THEN
+ 65                  'CONDITIONAL'
+ 66              ELSE
+ 67                  'REJECTED'
+ 68          END;
+ 69      END IF;
+ 70
+ 71      -- Output
+ 72      DBMS_OUTPUT.PUT_LINE('========== LOAN REPORT ==========');
+ 73      DBMS_OUTPUT.PUT_LINE('Monthly Salary      : Rs. ' || monthly_salary);
+ 74      DBMS_OUTPUT.PUT_LINE('Existing EMI        : Rs. ' || existing_emi);
+ 75      DBMS_OUTPUT.PUT_LINE('Requested Loan      : Rs. ' || loan_amount);
+ 76      DBMS_OUTPUT.PUT_LINE('Interest Rate       : ' || annual_rate || '%');
+ 77      DBMS_OUTPUT.PUT_LINE('Tenure              : ' || tenure_months || ' Months');
+ 78      DBMS_OUTPUT.PUT_LINE('---------------------------------');
+ 79      DBMS_OUTPUT.PUT_LINE('FOIR Limit (40%)    : Rs. ' || ROUND(foir_limit));
+ 80      DBMS_OUTPUT.PUT_LINE('Available EMI       : Rs. ' || ROUND(available_emi));
+ 81
+ 82      IF approved_amount > 0 THEN
+ 83          DBMS_OUTPUT.PUT_LINE('Calculated EMI      : Rs. ' || ROUND(emi));
+ 84      ELSE
+ 85          DBMS_OUTPUT.PUT_LINE('Calculated EMI      : Not Applicable');
+ 86      END IF;
+ 87
+ 88      DBMS_OUTPUT.PUT_LINE('Approved Loan       : Rs. ' || approved_amount);
+ 89      DBMS_OUTPUT.PUT_LINE('Decision            : ' || decision);
+ 90
+ 91  END;
+ 92  /
+========== LOAN REPORT ==========
+Monthly Salary      : Rs. 25000
+Existing EMI        : Rs. 2000
+Requested Loan      : Rs. 250000
+Interest Rate       : 10%
+Tenure              : 120 Months
+---------------------------------
+FOIR Limit (40%)    : Rs. 10000
+Available EMI       : Rs. 8000
+Calculated EMI      : Rs. 3304
+Approved Loan       : Rs. 250000
+Decision            : APPROVED
+----------------------------------------------------------------------------------------------------
